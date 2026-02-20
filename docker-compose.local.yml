@@ -1,0 +1,74 @@
+# Docker Compose configuration for local agent-zero image with model overrides
+# Usage:
+#   docker-compose -f docker-compose.local.yml up -d
+#   OR for a different user:
+#   sudo -u otheruser docker-compose -f docker-compose.local.yml up -d
+
+services:
+  agent-zero:
+    container_name: agent-zero-local
+    
+    # Use the locally built image
+    image: agent-zero:model-overrides
+    
+    # Alternative: build directly from Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.localdev
+    #   tags:
+    #     - agent-zero:model-overrides
+    
+    volumes:
+      # Mount the working directory for persistence
+      # For different user, ensure they have permissions to this path
+      - ./agent-zero-data:/a0
+      
+      # Optional: Mount specific user config
+      # - ${HOME}/.agent-zero:/a0/usr:rw
+    
+    ports:
+      # Map container ports to host ports
+      # Format: "HOST_PORT:CONTAINER_PORT"
+      - "50080:80"      # Web UI
+      - "50022:22"      # SSH (optional)
+      - "59000-59009:9000-9009"  # Additional ports (optional)
+    
+    environment:
+      # Set environment variables if needed
+      - BRANCH=local
+      # - API_KEY_OPENAI=${API_KEY_OPENAI}
+      # - API_KEY_ANTHROPIC=${API_KEY_ANTHROPIC}
+    
+    # Run as specific user (optional - for running as different user)
+    # user: "1000:1000"
+    
+    # Or use user namespace remapping
+    userns_mode: "host"
+    
+    restart: unless-stopped
+    
+    # Resource limits (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: 8G
+    #     reservations:
+    #       cpus: '2'
+    #       memory: 4G
+
+  # Optional: Use with existing agent-zero-base image but mount changes as volume
+  agent-zero-dev:
+    container_name: agent-zero-dev
+    image: agent0ai/agent-zero:latest
+    profiles: ["dev"]  # Only start with: docker-compose --profile dev up -d
+    volumes:
+      # Mount the modified files directly (development mode)
+      - ./python/helpers/subagents.py:/a0/python/helpers/subagents.py:ro
+      - ./python/extensions/agent_init/_15_load_profile_settings.py:/a0/python/extensions/agent_init/_15_load_profile_settings.py:ro
+      - ./agents:/a0/agents:ro
+      - ./webui/components/settings/agents:/a0/webui/components/settings/agents:ro
+      - ./agent-zero-data:/a0
+    ports:
+      - "50081:80"
+    restart: unless-stopped

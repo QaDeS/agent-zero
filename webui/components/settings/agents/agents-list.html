@@ -1,0 +1,264 @@
+<html>
+<head>
+  <title>Agent Profiles</title>
+  <script type="module">
+    import { store } from "/components/settings/agents/agents-store.js";
+  </script>
+</head>
+<body>
+  <div x-data>
+    <template x-if="$store.agents">
+      <div class="agents-modal-content">
+        
+        <!-- Header -->
+        <div class="agents-header">
+          <p class="agents-description">
+            Manage agent profiles. Each profile can have custom prompts, behavior, and model configurations.
+            <br>
+            <small>Model overrides allow specific roles to use different AI models than the global defaults.</small>
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <template x-if="$store.agents.isLoading">
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading agent profiles...</p>
+          </div>
+        </template>
+
+        <!-- Agents List -->
+        <template x-if="!$store.agents.isLoading">
+          <div class="agents-list">
+            <template x-for="agent in $store.agents.agentsList" :key="agent.name">
+              <div class="agent-card" :class="{ 'has-overrides': $store.agents.hasModelOverrides(agent) }">
+                <div class="agent-info">
+                  <div class="agent-title-row">
+                    <h3 class="agent-name" x-text="agent.title || agent.name"></h3>
+                    <span class="agent-badge" x-show="agent.origin && agent.origin.includes('user')" title="Custom agent">Custom</span>
+                    <span class="agent-badge override-badge" x-show="$store.agents.hasModelOverrides(agent)" title="Has model overrides">Models</span>
+                  </div>
+                  <p class="agent-description" x-text="agent.description || 'No description'" x-show="agent.description"></p>
+                  <p class="agent-context" x-text="agent.context" x-show="agent.context"></p>
+                </div>
+                <div class="agent-actions">
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary"
+                    @click="$store.agents.openEditModal(agent.name)"
+                    title="Edit agent profile"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-danger"
+                    @click="$store.agents.deleteAgent(agent.name)"
+                    x-show="agent.origin && agent.origin.includes('user')"
+                    title="Delete custom agent"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <!-- Info Box -->
+        <div class="agents-info-box">
+          <h4>💡 Tip: Model Overrides</h4>
+          <p>
+            You can configure model overrides in each agent profile to use different AI models for specific roles.
+            For example, use a reasoning model for the Developer agent, or a cheaper model for simple tasks.
+          </p>
+          <p>
+            Edit any agent profile to see the model override options.
+          </p>
+        </div>
+
+      </div>
+    </template>
+  </div>
+
+  <style>
+    .agents-modal-content {
+      padding: var(--spacing-md);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .agents-header {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .agents-description {
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    .agents-description small {
+      color: var(--color-text-tertiary);
+    }
+
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-xl);
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-border);
+      border-top: 3px solid var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: var(--spacing-md);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .agents-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .agent-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-panel);
+      transition: border-color 0.2s ease;
+    }
+
+    .agent-card:hover {
+      border-color: var(--color-primary);
+    }
+
+    .agent-card.has-overrides {
+      border-left: 3px solid var(--color-primary);
+    }
+
+    .agent-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .agent-title-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .agent-name {
+      margin: 0;
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+
+    .agent-badge {
+      font-size: 0.75em;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      color: var(--color-text-tertiary);
+      border: 1px solid var(--color-border);
+    }
+
+    .agent-badge.override-badge {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .agent-description {
+      margin: var(--spacing-xs) 0;
+      color: var(--color-text-secondary);
+      font-size: 0.9em;
+    }
+
+    .agent-context {
+      margin: var(--spacing-xs) 0 0 0;
+      color: var(--color-text-tertiary);
+      font-size: 0.85em;
+      font-style: italic;
+    }
+
+    .agent-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-shrink: 0;
+    }
+
+    .btn {
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text);
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--color-border);
+    }
+
+    .btn-secondary {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-danger {
+      border-color: var(--color-error);
+      color: var(--color-error);
+    }
+
+    .btn-danger:hover {
+      background: var(--color-error);
+      color: white;
+    }
+
+    .agents-info-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+    }
+
+    .agents-info-box h4 {
+      margin: 0 0 var(--spacing-sm) 0;
+      color: var(--color-text);
+    }
+
+    .agents-info-box p {
+      margin: var(--spacing-xs) 0;
+      color: var(--color-text-secondary);
+      font-size: 0.9em;
+    }
+
+    .agents-info-box p:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</body>
+</html>

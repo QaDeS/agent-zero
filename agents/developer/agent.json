@@ -1,5 +1,15 @@
 {
   "title": "Developer",
   "description": "Agent specialized in complex software development.",
-  "context": "Use this agent for software development tasks, including writing code, debugging, refactoring, and architectural design."
+  "context": "Use this agent for software development tasks, including writing code, debugging, refactoring, and architectural design.",
+  "enabled": true,
+  "_comment": "Example: Use a reasoning model for development tasks while keeping utility and embedding models as defaults",
+  "chat_model": {
+    "_comment": "Example: Use OpenRouter with Claude for coding tasks",
+    "provider": null,
+    "name": null,
+    "kwargs": {
+      "temperature": 0.2
+    }
+  }
 }

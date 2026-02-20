@@ -3,6 +3,7 @@
 <head>
   <script type="module">
     import { store } from "/components/sidebar/chats/chats-store.js";
+    import { store as agentsStore } from "/components/settings/agents/agents-store.js";
   </script>
 </head>
 
@@ -23,6 +24,8 @@
           d="m50.301 66.5c-9 0-16.398-7.3008-16.398-16.398 0-9.1016 7.3008-16.398 16.398-16.398 9.1016 0 16.398 7.3008 16.398 16.398 0 9.0977-7.3984 16.398-16.398 16.398zm0-25.5c-5 0-9.1016 4.1016-9.1016 9.1016s4.1016 9.1016 9.1016 9.1016 9.1016-4.1016 9.1016-9.1016c-0.003906-5-4.1016-9.1016-9.1016-9.1016z">
         </path>
       </svg>Settings</button>
+    <button class="config-button" id="agent-profiles"
+      @click="$store.agents.openAgentsModal()">Agents</button>
     <button class="config-button" id="memory-dash"
       @click="openModal('settings/memory/memory-dashboard.html');">Memory</button>
     <button class="config-button" id="dashboard" @click="deselectChat()">Dashboard</button>

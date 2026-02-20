@@ -1,5 +1,5 @@
 from python.helpers import files
-from typing import TypedDict, TYPE_CHECKING
+from typing import TypedDict, TYPE_CHECKING, Optional
 from pydantic import BaseModel, model_validator
 import json
 from typing import Literal
@@ -30,8 +30,26 @@ class SubAgentListItem(BaseModel):
         return self
 
 
+class ModelOverride(BaseModel):
+    """Model configuration override for a specific role."""
+    provider: Optional[str] = None
+    name: Optional[str] = None
+    api_base: Optional[str] = None
+    ctx_length: Optional[int] = None
+    vision: Optional[bool] = None
+    limit_requests: Optional[int] = None
+    limit_input: Optional[int] = None
+    limit_output: Optional[int] = None
+    kwargs: Optional[dict] = None
+
+
 class SubAgent(SubAgentListItem):
     prompts: dict[str, str] = {}
+    # Model overrides - allows roles to use different models than default
+    chat_model: Optional[ModelOverride] = None
+    utility_model: Optional[ModelOverride] = None
+    embeddings_model: Optional[ModelOverride] = None
+    browser_model: Optional[ModelOverride] = None
 
 
 def get_agents_list(project_name: str | None = None) -> list[SubAgentListItem]:
@@ -185,6 +203,33 @@ def _load_agent_data_from_dir(dir: str, name: str, origin: Origin) -> SubAgent |
     return subagent
 
 
+def _merge_model_overrides(
+    base: ModelOverride | None, override: ModelOverride | None
+) -> ModelOverride | None:
+    """Merge model overrides, with override taking precedence."""
+    if base is None:
+        return override
+    if override is None:
+        return base
+    
+    # Merge kwargs dicts if both exist
+    merged_kwargs = None
+    if base.kwargs or override.kwargs:
+        merged_kwargs = {**(base.kwargs or {}), **(override.kwargs or {})}
+    
+    return ModelOverride(
+        provider=override.provider if override.provider is not None else base.provider,
+        name=override.name if override.name is not None else base.name,
+        api_base=override.api_base if override.api_base is not None else base.api_base,
+        ctx_length=override.ctx_length if override.ctx_length is not None else base.ctx_length,
+        vision=override.vision if override.vision is not None else base.vision,
+        limit_requests=override.limit_requests if override.limit_requests is not None else base.limit_requests,
+        limit_input=override.limit_input if override.limit_input is not None else base.limit_input,
+        limit_output=override.limit_output if override.limit_output is not None else base.limit_output,
+        kwargs=merged_kwargs,
+    )
+
+
 def _merge_agents(base: SubAgent | None, override: SubAgent | None) -> SubAgent | None:
     if base is None:
         return override
@@ -202,6 +247,10 @@ def _merge_agents(base: SubAgent | None, override: SubAgent | None) -> SubAgent 
         context=override.context,
         origin=_merge_origins(base.origin, override.origin),
         prompts=merged_prompts,
+        chat_model=_merge_model_overrides(base.chat_model, override.chat_model),
+        utility_model=_merge_model_overrides(base.utility_model, override.utility_model),
+        embeddings_model=_merge_model_overrides(base.embeddings_model, override.embeddings_model),
+        browser_model=_merge_model_overrides(base.browser_model, override.browser_model),
     )
 
 

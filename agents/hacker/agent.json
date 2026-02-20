@@ -1,5 +1,7 @@
 {
   "title": "Hacker",
   "description": "Agent specialized in cyber security and penetration testing.",
-  "context": "Use this agent for cybersecurity tasks such as penetration testing, vulnerability analysis, and security auditing."
+  "context": "Use this agent for cybersecurity tasks such as penetration testing, vulnerability analysis, and security auditing.",
+  "enabled": true,
+  "_comment": "Model overrides can be specified to use different models for security tasks. See _example/agent.json for all available options."
 }

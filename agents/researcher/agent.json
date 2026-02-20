@@ -1,5 +1,14 @@
 {
   "title": "Researcher",
   "description": "Agent specialized in research, data analysis and reporting.",
-  "context": "Use this agent for information gathering, data analysis, topic research, and generating comprehensive reports."
+  "context": "Use this agent for information gathering, data analysis, topic research, and generating comprehensive reports.",
+  "enabled": true,
+  "_comment": "Example: Use a larger context window for research tasks that involve processing many documents",
+  "chat_model": {
+    "_comment": "Example: Increase context length for research tasks",
+    "ctx_length": null,
+    "kwargs": {
+      "temperature": 0.7
+    }
+  }
 }

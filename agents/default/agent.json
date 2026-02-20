@@ -1,5 +1,7 @@
 {
   "title": "Default prompts",
   "description": "Default prompt file templates. Should be inherited and overriden by specialized prompt profiles.",
-  "context": ""
+  "context": "",
+  "enabled": true,
+  "_comment": "Model overrides can be specified here to use different models for the default agent. See _example/agent.json for all available options."
 }

@@ -1,0 +1,18 @@
+# Local development image with model override changes
+FROM agent0ai/agent-zero:latest
+
+# Copy only the changed Python files and agent configs
+COPY ./python/helpers/subagents.py /a0/python/helpers/subagents.py
+COPY ./python/extensions/agent_init/_15_load_profile_settings.py /a0/python/extensions/agent_init/_15_load_profile_settings.py
+COPY ./agents/ /a0/agents/
+
+# Set proper permissions
+RUN chmod -R 755 /a0/agents && \
+    chmod 644 /a0/python/helpers/subagents.py && \
+    chmod 644 /a0/python/extensions/agent_init/_15_load_profile_settings.py
+
+# Expose ports
+EXPOSE 22 80 9000-9009
+
+# Use the same entrypoint as the original
+CMD ["/exe/initialize.sh", "local"]

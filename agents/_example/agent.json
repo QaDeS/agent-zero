@@ -1,0 +1,50 @@
+{
+  "title": "Example Agent Profile",
+  "description": "Example agent configuration demonstrating all available options including model overrides.",
+  "context": "This is an example agent profile. Copy this folder to create your own custom agent profiles.",
+  "enabled": true,
+  "_comment": "Model overrides allow this role to use different models than the defaults. Remove or set to null to use global settings.",
+  "chat_model": {
+    "_comment": "Override the main chat model for this role",
+    "provider": null,
+    "name": null,
+    "api_base": null,
+    "ctx_length": null,
+    "vision": null,
+    "limit_requests": null,
+    "limit_input": null,
+    "limit_output": null,
+    "kwargs": null
+  },
+  "utility_model": {
+    "_comment": "Override the utility model for this role (used for memory, summarization, etc.)",
+    "provider": null,
+    "name": null,
+    "api_base": null,
+    "ctx_length": null,
+    "limit_requests": null,
+    "limit_input": null,
+    "limit_output": null,
+    "kwargs": null
+  },
+  "embeddings_model": {
+    "_comment": "Override the embeddings model for this role",
+    "provider": null,
+    "name": null,
+    "api_base": null,
+    "limit_requests": null,
+    "limit_input": null,
+    "kwargs": null
+  },
+  "browser_model": {
+    "_comment": "Override the browser model for this role (used for web browsing)",
+    "provider": null,
+    "name": null,
+    "api_base": null,
+    "vision": null,
+    "limit_requests": null,
+    "limit_input": null,
+    "limit_output": null,
+    "kwargs": null
+  }
+}
